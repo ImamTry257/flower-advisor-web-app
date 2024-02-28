@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +23,7 @@ class RegisterController extends Controller
     |
     */
 
-    use RegistersUsers;
+    // use RegistersUsers;
 
     /**
      * Where to redirect users after registration.
@@ -38,6 +40,36 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+    }
+
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        //validate form
+        $this->validate($request, [
+            'name'                  => 'required|unique:users,name',
+            'email'                 => 'required',
+            'password'              => 'required|confirmed',
+            'password_confirmation' => 'required'
+        ]);
+
+        try {
+            DB::table('users')
+                ->insert([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password)
+                ]);
+
+            return redirect()->route('login');
+        } catch (\Throwable $th) {
+            # dd($th->getMessage());
+            return redirect()->route('register')->with('error', 'Create Data Admin fail!');
+        }
     }
 
     /**
