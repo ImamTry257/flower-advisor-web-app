@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware([Authenticate::class])->group(function(){
     Route::get('/', function () {
-        return view('welcome');
+        return view('home');
     });
 });
 
